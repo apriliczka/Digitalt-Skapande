@@ -1,0 +1,28 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Enemy : MonoBehaviour
+{
+
+    [SerializeField] float enemySpeed = 10f;
+    Transform target;
+    CapsuleCollider2D enemyBodyCollider;
+    Rigidbody2D enemyRigidBody;
+
+    void Start()
+    {
+        enemyRigidBody = GetComponent<Rigidbody2D>();
+        target = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
+    }
+
+    void FixedUpdate()
+    {
+        EnemyMovement();
+    }
+
+    void EnemyMovement()
+    {
+        transform.position = Vector2.MoveTowards(transform.position, target.transform.position, enemySpeed * Time.deltaTime);
+    }
+}
