@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    // UNNECESSARY SCRIPT FOR THE MOMENT!!
+    // UNNECESSARY SCRIPT FOR THE MOMENT!! Written by one of the contributors
+   
 
     private float horizontal;
     [SerializeField] private float speed = 10f;
