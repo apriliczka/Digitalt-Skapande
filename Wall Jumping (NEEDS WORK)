@@ -1,0 +1,127 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+ [Header("Wall Jumping")]
+    public float wallJumpForce = 5f;
+    public float wallJumpTime = 0.2f;
+    public float wallSlideSpeed = 0.2f;
+    public float wallDistance = 0.5f;
+    public int jumpsLeft;
+    public int jumpCount = 2;
+    bool wallJumping = true;
+    bool movementLocked = false;
+    RaycastHit2D wallCheckHit;
+    float jumpTime;
+  
+ // CACHED REFERENCES
+    Vector2 playerMovement;
+    Rigidbody2D myRigidBody;
+    Collider2D myBodyCollider;
+    AudioSource audioSource;
+    Animator myAnimator;
+    BoxCollider2D mySideCollider;
+
+   void Start()
+    {
+        myRigidBody = GetComponent<Rigidbody2D>();
+        myBodyCollider = GetComponent<Collider2D>();
+        mySideCollider = GetComponent<BoxCollider2D>();
+        myAnimator = GetComponent<Animator>();
+        audioSource = gameObject.AddComponent<AudioSource>();
+
+        jumpsLeft = jumpCount;
+    }
+  
+    void FixedUpdate()
+    {
+        Vector2 playerVelocity = new Vector2(playerMovement.x * moveSpeed, myRigidBody.velocity.y);     // Player Movement
+        myRigidBody.velocity = playerVelocity;
+
+        // WALLSLIDING
+        /*mx = Input.GetAxis("Horizontal");     
+        myRigidBody.velocity = new Vector2(mx * moveSpeed, myRigidBody.velocity.y); */
+
+
+        // GROUND CHECK
+        bool touchingGround = Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
+        
+        if (touchingGround)
+        {
+            isGrounded = true;
+        }
+        else 
+        { 
+            isGrounded = false; 
+        } 
+        
+           if (jumpsLeft >= 1)
+        {
+            Vector2 jumpHeight = new Vector2(myRigidBody.velocity.x, jumpForce);
+            myRigidBody.velocity = (jumpHeight);
+
+            jumpsLeft--;
+    }
+        
+   void OnJump(InputValue value)
+    {
+        /*
+        if (!isAlive)
+        {
+            return;    
+        }*/
+        
+        if (mySideCollider.IsTouchingLayers(LayerMask.GetMask("Walls")) && Mathf.Abs(playerMovement.x) > 0)
+        {
+            StopAllCoroutines();
+
+            StartCoroutine(StartWallJumpingCoroutine());
+        } 
+        
+        if (!myBodyCollider.IsTouchingLayers(LayerMask.GetMask("Ground")))
+        {
+           return;
+        }
+
+        if (value.isPressed)
+        {
+           myRigidBody.velocity += new Vector2(0, jumpForce);
+           myAnimator.SetBool("Jumping", true);
+        }
+
+        // DOUBLE JUMP FUNCTION WORK IN PROGRESS
+        /* else if (value.isPressed && extraJumps > 0)         
+        {
+            myRigidbody.velocity = new Vector2(0, jumpForce);
+            myAnimator.SetBool("Jumping", true);
+            myRigidbody.velocity = Vector2.up * extraJumps;
+            extraJumps--;
+        }*/
+    }
+        
+    IEnumerator StartWallJumpingCoroutine()
+    {
+        movementLocked = true;
+
+        Vector2 wallJumpHeight = new Vector2(wallJumpForce * -transform.localScale.x, jumpForce);
+       // GetComponent<S_VFX>().WallJumpVFX();
+        myRigidBody.velocity = (wallJumpHeight);
+
+        yield return new WaitForSeconds(0.5f);
+
+        movementLocked = false;
+    }
+  
+    public int GetJumpCount() { return jumpCount; }
+    public void SetJumpCount(int value) { jumpCount = value; }
+    
+      private void OnCollisionEnter2D(Collision2D collision)
+     {
+        if (myBodyCollider.IsTouchingLayers(LayerMask.GetMask("Walls")) || mySideCollider.IsTouchingLayers(LayerMask.GetMask("Walls")))
+        {
+            jumpsLeft = jumpCount;
+        }
+     }
+
+    }
