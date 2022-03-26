@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+public class Wall Jumping : MonoBehavior
+{
  [Header("Wall Jumping")]
     public float wallJumpForce = 5f;
     public float wallJumpTime = 0.2f;
@@ -124,4 +126,4 @@ using UnityEngine.InputSystem;
         }
      }
 
-    }
+ }
